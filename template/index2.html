@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="theme-dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/bulma.min.css" />
+    <title>House Drama Competition 2025</title>
+    <style>
+        .image{
+            /* background-color: red; */
+            padding: 20px;
+            padding-bottom: 35px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="m-6">
+    <div class="container">
+        <h1 class="title mt-6">House Drama Competition 2025 Voting</h1>
+        <h1 class="title is-4">请点击两个您觉得最出彩的学院戏剧。</h1>
+        {% if messages %}
+            <div class="notifications">
+                {% for message in messages %}
+                    <div class="notification is-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="columns">
+            <div class="column">
+                <figure class="image" id="lbtn">
+                    <img src="/static/L.webp" alt="">
+                </figure>
+            </div>
+            <div class="column">
+                <figure class="image" id="pbtn">
+                    <img src="/static/P.png" alt="">
+                </figure>
+            </div>
+            <div class="column">
+                <figure class="image" id="vbtn">
+                    <img src="/static/V.webp" alt="">
+                </figure>
+            </div>
+        </div>
+        <button id="submitbtn" class="button is-success is-large is-fullwidth">提交</button>
+    </div>
+
+    <!-- CSRF Token -->
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+</body>
+<script>
+    let lbtn = document.getElementById("lbtn"); let lflag = false;
+    let pbtn = document.getElementById("pbtn"); let pflag = false;
+    let vbtn = document.getElementById("vbtn"); let vflag = false;
+    let submitbtn = document.getElementById("submitbtn");
+
+    lbtn.onclick = function() {
+        if(lflag){
+            lbtn.style["background-color"] = "rgba(0, 0, 0, 0)";
+            lflag = false;
+        }else{
+            if(!(pflag&&vflag)){
+                lbtn.style["background-color"] = "red";
+                lflag = true;
+            }
+        }
+    }
+
+    pbtn.onclick = function() {
+        if(pflag){
+            pbtn.style["background-color"] = "rgba(0, 0, 0, 0)";
+            pflag = false;
+        }else{
+            if(!(lflag&&vflag)){
+                pbtn.style["background-color"] = "red";
+                pflag = true;
+            }
+        }
+    }
+
+    vbtn.onclick = function() {
+        if(vflag){
+            vbtn.style["background-color"] = "rgba(0, 0, 0, 0)";
+            vflag = false;
+        }else{
+            if(!(lflag&&pflag)){
+                vbtn.style["background-color"] = "red";
+                vflag = true;
+            }
+        }
+    }
+
+    submitbtn.onclick = function() {
+        var formData = new FormData();
+        formData.append('lflag', lflag);
+        formData.append('pflag', pflag);
+        formData.append('vflag', vflag);
+
+        // 获取 CSRF Token
+        var csrfToken = document.getElementById("csrf_token").value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(){
+            if (xhr.readyState === 4){
+                if (xhr.status === 200){
+                    console.log(xhr.responseText);
+                    window.location.href="/"
+                } else {
+                    alert(xhr.statusText);
+                }
+            }
+        };
+        xhr.onerror = function (e) {
+            alert(xhr.statusText);
+        };
+        
+        // 添加 CSRF Token 到请求头
+        xhr.open('POST', '/', true);
+        xhr.setRequestHeader("X-CSRFToken", csrfToken);
+        xhr.send(formData);
+    }
+</script>
+</html>
